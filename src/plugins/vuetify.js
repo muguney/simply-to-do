@@ -10,23 +10,13 @@ import 'vuetify/styles'
 
 // Composables
 import { createVuetify } from 'vuetify'
-
-// https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides
 export default createVuetify({
   theme: {
-    breakpoint: {
-      thresholds: {
-        xs: 340,
-        sm: 540,
-        md: 800,
-        lg: 1280,
-      }
-    },
     themes: {
       light: {
         colors: {
-          primary: '#539D57',
-          secondary: '#333333',
+          primary: '#00d54b',
+          secondary: '#222222',
         },
       },
     },
