@@ -4,8 +4,9 @@
       <v-app-bar-title>
         <v-img src="@/assets/simply-logo-dark.svg" width="200px"></v-img
       ></v-app-bar-title>
+
       <v-btn
-        v-if="$vuetify.display.mdAndDown"
+        v-if="mobile"
         icon="mdi-plus"
         color="primary"
         to="/"
@@ -18,7 +19,7 @@
       </v-btn-group>
       <v-btn
         icon="mdi-menu"
-        v-if="$vuetify.display.mdAndDown"
+        v-if="mobile"
         @click="menu = !menu"
       ></v-btn>
     </v-app-bar>
@@ -27,6 +28,7 @@
         <router-view />
       </v-container>
     </v-main>
+
     <v-footer
       app
       inset
@@ -37,20 +39,15 @@
       ©Copyright {{ new Date().getFullYear() }} Simply To-Do List All Rights
       Reserved
     </v-footer>
-    <navigation v-model="menu" v-if="$vuetify.display.mdAndDown" />
+    <navigation v-model="menu" v-if="mobile" />
   </v-app>
 </template>
 
-<script>
+<script setup>
+import {  onMounted,ref,watch  } from "vue";
+import { useDisplay } from 'vuetify'
 import Navigation from "@/layouts/Navigation";
-export default {
-  data() {
-    return {
-      menu: false,
-    };
-  },
-  components: {
-    Navigation,
-  },
-};
+const menu = ref(false);
+const { mobile } = useDisplay()
+
 </script>
