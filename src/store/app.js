@@ -1,10 +1,8 @@
 // Utilities
 import { defineStore } from "pinia";
-
 export const useAppStore = defineStore("app", {
   state: () => ({}),
 });
-
 export const useTodosStore = defineStore("todos", {
   state: () => ({
     todoList: [
@@ -32,7 +30,6 @@ export const useTodosStore = defineStore("todos", {
         state: true,
         description: "Go to the work",
       },
-
     ],
   }),
   getters: {
@@ -45,12 +42,6 @@ export const useTodosStore = defineStore("todos", {
         }
       }
       return tags.sort();
-    },
-    filterByTitle: (state) => {
-      return (title) =>
-        state.todoList.filter((items) =>
-          items.title.toLowerCase().includes(title)
-        );
     },
     filterAll: (state) => {
       return (tags, title) => {
@@ -71,7 +62,9 @@ export const useTodosStore = defineStore("todos", {
           filteredTodoList = state.todoList;
         }
         return title
-          ? filteredTodoList.filter((items) => items.title.toLowerCase().includes(title))
+          ? filteredTodoList.filter((items) =>
+              items.title.toLowerCase().includes(title)
+            )
           : filteredTodoList;
       };
     },
