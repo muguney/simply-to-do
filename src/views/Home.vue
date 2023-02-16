@@ -1,20 +1,20 @@
 <template>
   <div>
-    <v-toolbar class="elevation-1">
+    <v-toolbar class="elevation-1 mb-2">
       <v-toolbar-title>To-Do List</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn icon @click="filterDialog = true">
-        <v-icon>mdi-magnify</v-icon>
-      </v-btn>
-      <!-- <v-btn icon>
-        <v-icon>mdi-magnify</v-icon>
-      </v-btn>
-      <v-btn icon>
-        <v-icon>mdi-heart</v-icon>
-      </v-btn> -->
+       <v-btn
+      color="primary"
+       variant="outlined"
+      prepend-icon="mdi-filter-outline"
+      @click="filterDialog = true"
+    >
+      Filters
+    </v-btn>
+
     </v-toolbar>
 
-    <v-dialog v-model="filterDialog" width="300">
+    <v-dialog v-model="filterDialog" min-width="300" max-width="500">
       <v-card class="pa-3">
         <v-toolbar class="elevation-1 mb-2" density="compact">
           <v-toolbar-title>To-Do List Filter</v-toolbar-title>
@@ -37,7 +37,7 @@
           clearable
           v-model="tagsParam"
           :items="store.getTags"
-          class="font-weight-bold"
+          class="font-weight-bold mb-2"
           item-text="name"
           variant="solo"
           chips
@@ -46,6 +46,28 @@
           multiple
         >
         </v-select>
+        <v-select
+          v-model="sortingParam"
+          clearable
+          label="Sorting"
+          class="font-weight-bold mb-2"
+          :items="sortingParams"
+          hide-details
+          item-text="title"
+          item-value="value"
+          variant="solo"
+        ></v-select>
+        <v-select
+          v-model="taskStatus"
+          clearable
+          label="Filter by Status"
+          class="font-weight-bold"
+          hide-details
+          :items="stateParams"
+          item-text="title"
+          item-value="value"
+          variant="solo"
+        ></v-select>
         <v-card-actions class="pa-0 ma-0">
           <v-btn
             color="primary"
@@ -58,21 +80,67 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <div v-if="smAndDown">
+      <v-card
+        class="mb-2 py-2"
+        v-for="(item, i) in store.filterAll(
+          tagsParam,
+          titleParam.toLowerCase(),
+          sortingParam,
+          taskStatus
+        )"
+        :key="i"
+      >
+        <v-card-item>
+          <v-card-title>{{ item.title }}</v-card-title>
+          <v-card-subtitle>{{
+            item.endDate && formatDateTime(item.endDate)
+          }}</v-card-subtitle>
+        </v-card-item>
+        <v-card-text>
+          <v-row class="my-0 py-0">
+            <v-col class="my-0 py-0"
+              ><h3 class="mb-1">Description</h3>
+              {{ item.description }}</v-col
+            >
+          </v-row>
+          <v-row class="my-0 py-0 align-center">
+            <v-col class="my-0 py-1">
+              <v-chip v-for="(tag, x) in item.tags" :key="x" class="mb-1 mr-1">
+                {{ tag }}
+              </v-chip>
+            </v-col>
+          </v-row>
+          <v-row class="my-0 py-0 align-center">
+            <v-col class="my-0 py-0"><h3 class="mb-1">Status</h3></v-col>
+            <v-col class="my-0 py-0">
+              <v-checkbox v-model="item.state" @change="changeStatus(item.id,item.state)" hide-details="false"></v-checkbox>
+            </v-col>
+          </v-row>
+        </v-card-text>
+      </v-card>
+    </div>
 
     <v-data-table
+      v-if="!smAndDown"
       :headers="headers"
-      :items="store.filterAll(tagsParam, titleParam.toLowerCase(),'endDate')"
-      :sort-by="[
-        { key: 'state', order: 'asc' },
-        { key: 'endDate', order: 'desc' },
-      ]"
+      :items="
+        store.filterAll(
+          tagsParam,
+          titleParam.toLowerCase(),
+          sortingParam,
+          taskStatus
+        )
+      "
       items-per-page="-1"
       class="elevation-1 mt-4"
     >
+
       <template v-slot:[`item.state`]="{ item }">
         <v-checkbox
           v-model="item.columns.state"
           hide-details="false"
+            @change="changeStatus(item.columns.id,item.columns.state)"
         ></v-checkbox>
       </template>
       <template v-slot:[`item.title`]="{ item }">
@@ -88,7 +156,9 @@
           :style="{
             'text-decoration': item.columns.state ? 'line-through' : 'none',
           }"
-          >{{ item.columns.endDate && formatDateTime(item.columns.endDate) }}</span
+          >{{
+            item.columns.endDate && formatDateTime(item.columns.endDate)
+          }}</span
         >
       </template>
     </v-data-table>
@@ -102,20 +172,36 @@ import { useTodosStore } from "@/store/app";
 import { storeToRefs } from "pinia";
 import { VDataTable } from "vuetify/labs/VDataTable";
 const store = useTodosStore();
-const { mobile } = useDisplay();
+const { smAndDown } = useDisplay();
 const filterDialog = ref(false);
 const titleParam = ref("");
+const sortingParam = ref();
 const tagsParam = ref();
+const taskStatus = ref();
 const headers = ref([
-  { title: "State", width: "90", key: "state" },
+  { title: "Id",  key: "id", sortable: false },
+  { title: "State", width: "90", key: "state", sortable: false },
   { title: "Title", key: "title", sortable: false },
   { title: "Tags", key: "tags", sortable: false },
-  { title: "End Date", key: "endDate" },
+  { title: "End Date", key: "endDate", sortable: false },
   { title: "Description", key: "description", sortable: false },
 ]);
-const selected = ref([]);
+const sortingParams = ref([
+  { title: "Sort by State ASC", value: "1" },
+  { title: "Sort by State DESC", value: "2" },
+  { title: "Sort by End Date ASC", value: "3" },
+  { title: "Sort by End Date DESC", value: "4" },
+]);
+const stateParams = ref([
+  { title: "All", value: "0" },
+  { title: "Completed Tasks", value: "1" },
+  { title: "Uncompleted Tasks", value: "2" },
+]);
 function formatDateTime(value) {
-  return moment(value).format("YYYY-MM-DD HH:mm");
+  return moment(new Date(value)).format("YYYY-MM-DD HH:mm");
+}
+function changeStatus(id,value){
+ store.updateStatus(id,value,"teta")
 }
 </script>
 <style>

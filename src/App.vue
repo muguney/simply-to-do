@@ -6,7 +6,7 @@
       ></v-app-bar-title>
 
       <v-btn
-        v-if="mobile"
+        v-if="smAndDown"
         icon="mdi-plus"
         color="primary"
         to="/"
@@ -19,7 +19,7 @@
       </v-btn-group>
       <v-btn
         icon="mdi-menu"
-        v-if="mobile"
+        v-if="smAndDown"
         @click="menu = !menu"
       ></v-btn>
     </v-app-bar>
@@ -39,7 +39,7 @@
       ©Copyright {{ new Date().getFullYear() }} Simply To-Do List All Rights
       Reserved
     </v-footer>
-    <navigation v-model="menu" v-if="mobile" />
+    <navigation v-model="menu" v-if="smAndDown" />
   </v-app>
 </template>
 
@@ -48,6 +48,6 @@ import {  onMounted,ref,watch  } from "vue";
 import { useDisplay } from 'vuetify'
 import Navigation from "@/layouts/Navigation";
 const menu = ref(false);
-const { mobile } = useDisplay()
+const { smAndDown } = useDisplay()
 
 </script>

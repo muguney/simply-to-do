@@ -32,6 +32,12 @@ export const useTodosStore = defineStore("todos", {
       },
     ],
   }),
+  actions: {
+    updateStatus(id, value) {
+      console.log("action",id,value)
+      this.todoList.find((item) => item.id==id).state = value
+    }
+  },
   getters: {
     getTags: (state) => {
       let tags = [];
@@ -44,8 +50,10 @@ export const useTodosStore = defineStore("todos", {
       return tags.sort();
     },
     filterAll: (state) => {
-      return (tags, title) => {
+      return (tags, title, sort, taskStatus) => {
         let filteredTodoList = [];
+
+        // Filter by tags
         let tagList = tags ? tags : "";
         if (tags && tags.length > 0) {
           for (let i = 0; i < state.todoList.length; i++) {
@@ -61,49 +69,61 @@ export const useTodosStore = defineStore("todos", {
         } else {
           filteredTodoList = state.todoList;
         }
-        return title
+        // Filter by title
+        filteredTodoList = title
           ? filteredTodoList.filter((items) =>
               items.title.toLowerCase().includes(title)
             )
           : filteredTodoList;
-      };
-    },
-    filterCompleted(state) {
-      return (tags, title) => {
-        let filteredTodoList = [];
-        let tagList = tags;
-        console.log("tags", tagList);
-        for (let i = 0; i < state.todoList.length; i++) {
-          for (let x = 0; x < tagList.length; x++) {
-            state.todoList[i].state == true &&
-              state.todoList[i].tags.filter((items) =>
-                items.includes(tagList[x])
-              ).length > 0 &&
-              filteredTodoList.push(state.todoList[i]);
+
+        // Sorting
+        if (sort) {
+          switch (parseInt(sort)) {
+            case 1: // byStateAsc
+              filteredTodoList = filteredTodoList.sort((a, b) =>
+                b.state < a.state ? 1 : -1
+              );
+              break;
+            case 2: // byStateDesc
+              filteredTodoList = filteredTodoList.sort((a, b) =>
+                a.state < b.state ? 1 : -1
+              );
+              break;
+            case 3: // byEndDateAsc
+              filteredTodoList = filteredTodoList.sort((a, b) =>
+                b.endDate < a.endDate ? 1 : -1
+              );
+              break;
+            case 4: // byEndDateDesc
+              filteredTodoList = filteredTodoList.sort((a, b) =>
+                a.endDate < b.endDate ? 1 : -1
+              );
+              break;
+            default:
+              return filteredTodoList;
+              break;
           }
         }
-        return title
-          ? filteredTodoList.filter((items) => items.title.includes(title))
-          : filteredTodoList;
-      };
-    },
-    filterUncompleted(state) {
-      return (tags, title) => {
-        let filteredTodoList = [];
-        let tagList = tags;
-        console.log("tags", tagList);
-        for (let i = 0; i < state.todoList.length; i++) {
-          for (let x = 0; x < tagList.length; x++) {
-            state.todoList[i].state == false &&
-              state.todoList[i].tags.filter((items) =>
-                items.includes(tagList[x])
-              ).length > 0 &&
-              filteredTodoList.push(state.todoList[i]);
+
+        // Status
+        if (taskStatus) {
+          switch (parseInt(taskStatus)) {
+            case 1: // Completed
+              filteredTodoList = filteredTodoList.filter(
+                (items) => items.state == true
+              );
+              break;
+            case 2: // Uncompleted
+              filteredTodoList = filteredTodoList.filter(
+                (items) => items.state == false
+              );
+              break;
+            default:
+              filteredTodoList = filteredTodoList;
+              break;
           }
         }
-        return title
-          ? filteredTodoList.filter((items) => items.title.includes(title))
-          : filteredTodoList;
+        return filteredTodoList;
       };
     },
   },
