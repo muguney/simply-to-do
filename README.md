@@ -1,44 +1,11 @@
-# default
+# Simply To-Do 
+Simply To-Do is a simple to do web app I made using Vue3, Pinia, Vuetify3, VueRouter, ViteJS.
 
 ## Project setup
-
-```
-# yarn
-yarn
-
-# npm
 npm install
 
-# pnpm
-pnpm install
-```
+## Compiles and hot-reloads for development
 
-### Compiles and hot-reloads for development
-
-```
-# yarn
-yarn dev
-
-# npm
 npm run dev
 
-# pnpm
-pnpm dev
-```
 
-### Compiles and minifies for production
-
-```
-# yarn
-yarn build
-
-# npm
-npm run build
-
-# pnpm
-pnpm build
-```
-
-### Customize configuration
-
-See [Configuration Reference](https://vitejs.dev/config/).
