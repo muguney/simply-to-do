@@ -1,9 +1,26 @@
 <template>
-  <div>
-    <v-toolbar class="elevation-1 mb-2">
-      <v-toolbar-title>Edit Task</v-toolbar-title>
-    </v-toolbar>
-    <v-card class="pa-3">
+  <v-navigation-drawer
+    permanent
+    :theme="store.drawerType == 'menu' ? 'dark' : 'light'"
+    fixed
+    app
+    :width="store.drawerType == 'edit' ? 350 : 250"
+    :location="store.drawerLocation"
+  >
+    <v-list nav v-if="store.drawerType == 'menu'">
+      <v-list-item
+        router
+        prepend-icon="mdi-format-list-checkbox"
+        title="To-Do List"
+        to="/"
+      ></v-list-item>
+    </v-list>
+
+    <div class="pa-3" v-if="store.drawerType == 'edit'">
+      <v-toolbar class="elevation-1 mb-2" density="compact">
+        <v-toolbar-title>Edit Task</v-toolbar-title>
+      </v-toolbar>
+
       <v-text-field
         v-model="title"
         outlined
@@ -18,6 +35,18 @@
           <span class="text-red"><strong>* </strong></span>Title
         </template></v-text-field
       >
+      <v-combobox
+        clearable
+        v-model="tags"
+        variant="solo"
+        class="font-weight-bold mb-2"
+        label="Task Tags"
+        v-on:keypress="isLetter($event)"
+        multiple
+        hide-details
+        chips
+      ></v-combobox>
+
       <v-text-field
         v-model="endDate"
         solo
@@ -48,40 +77,27 @@
           >Close Calendar</v-btn
         >
       </div>
-      <vue-editor v-model="description"></vue-editor>
-      <v-card-actions>
-        <v-switch
-          v-model="state"
-          label="Task Status"
-          color="green"
-          class="font-weight-bold ml-1"
-          hide-details
-        ></v-switch>
-        <v-btn color="red" variant="flat" to="/">
-          Back to List
-        </v-btn>
-        <v-btn color="green" variant="flat" @click="save()">
-          Save Task
-        </v-btn>
-      </v-card-actions>
-    </v-card>
-  </div>
-</template>
 
+      <v-card-actions class="d-flex justify-end">
+        <v-btn color="red" variant="flat" @click="store.drawer = false">
+          Close
+        </v-btn>
+        <v-btn color="green" variant="flat" @click="save()"> Save </v-btn>
+      </v-card-actions>
+    </div>
+  </v-navigation-drawer>
+</template>
 <script setup>
-import { onMounted, ref, watch } from "vue";
+import { storeToRefs } from "pinia";
+import { onActivated, onMounted, ref, watch } from "vue";
 import { useTodosStore } from "@/store/app";
-import { useRoute, useRouter } from "vue-router";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
-import { VueEditor } from "vue3-editor";
 const store = useTodosStore();
-const route = useRoute();
-const router = useRouter();
+const { getEditTaskId } = storeToRefs(store);
 const title = ref();
+const tags = ref([]);
 const endDate = ref();
-const description = ref();
-const state = ref(false);
 const datepicker = ref(false);
 const editTask = ref();
 
@@ -92,39 +108,40 @@ function titleCheck() {
   }
 }
 
-onMounted(() => {
-  const currentTask = store.getTaskById(route.params.taskId);
+watch(getEditTaskId, (newId, oldId) => {
+  console.log(newId, oldId);
+  const currentTask = store.getTaskById(newId);
   title.value = currentTask.title;
   endDate.value = currentTask.endDate;
-  description.value = currentTask.description;
-  state.value = currentTask.state;
+  tags.value = currentTask.tags;
+});
+onMounted(() => {
+  const currentTask = store.getTaskById(store.editTaskId);
+  title.value = currentTask.title;
+  endDate.value = currentTask.endDate;
+  tags.value = currentTask.tags;
 });
 
 function save() {
   if (
     title.value == undefined ||
-    title.value == null ||
-    endDate.value == undefined ||
-    endDate.value == null
+    title.value == null
   ) {
     store.alertType = "error";
-    store.alertText = "Please fill title field and select task end date !";
+    store.alertText = "Please fill the title field!";
     store.alertState = true;
   } else {
     this.editTask = {
       title: title,
       endDate: endDate,
-      state: state,
-      description: description,
+      tags: tags,
     };
-    store.editTask(route.params.taskId, this.editTask);
+    store.editTaskDrawer(store.editTaskId, this.editTask);
     store.alertType = "success";
     store.alertText = "Task edited succesfully!";
     store.alertState = true;
-    router.push("/");
+    store.drawer = false;
   }
 }
 </script>
 
-<style lang="scss" scoped>
-</style>

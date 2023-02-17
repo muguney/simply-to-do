@@ -3,35 +3,34 @@
     <v-toolbar class="elevation-1 mb-2">
       <v-toolbar-title>To-Do List</v-toolbar-title>
       <v-spacer v-if="!smAndDown"></v-spacer>
-        <v-spacer v-if="!smAndDown"></v-spacer>
-        <v-spacer v-if="!smAndDown"></v-spacer>
-       <v-text-field
-          v-model="titleParam"
-          outlined
-          density="compact"
-          clearable
-          class="font-weight-bold mr-1"
-          prepend-inner-icon="mdi-magnify"
-          :label="!smAndDown ? 'Search by title' : 'Search'"
-          max-width="200"
-          hide-details
-        ></v-text-field>
+      <v-spacer v-if="!smAndDown"></v-spacer>
+      <v-spacer v-if="!smAndDown"></v-spacer>
+      <v-text-field
+        v-model="titleParam"
+        outlined
+        density="compact"
+        clearable
+        class="font-weight-bold mr-1"
+        prepend-inner-icon="mdi-magnify"
+        :label="!smAndDown ? 'Search by title' : 'Search'"
+        max-width="200"
+        hide-details
+      ></v-text-field>
 
-      <v-btn v-if="!smAndDown"
+      <v-btn
+        v-if="!smAndDown"
         color="primary"
         variant="outlined"
         prepend-icon="mdi-filter-outline"
         @click="filterDialog = true"
       >
-       Filters
+        Filters
       </v-btn>
 
-        <v-btn v-else   color="primary" icon  @click="filterDialog = true">
-            <v-icon>mdi-filter-outline</v-icon>
-          </v-btn>
-
+      <v-btn v-else color="primary" icon @click="filterDialog = true">
+        <v-icon>mdi-filter-outline</v-icon>
+      </v-btn>
     </v-toolbar>
-
 
     <v-dialog v-model="filterDialog" min-width="300" max-width="500">
       <v-card class="pa-3">
@@ -102,28 +101,35 @@
         :key="i"
       >
         <v-card-item>
-          <v-card-title><span
-          :style="{
-            'text-decoration': item.state ? 'line-through' : 'none',
-          }"
-          >{{ item.title }}</span
-        ></v-card-title>
+          <v-card-title>
+            <router-link
+              :to="'/task-edit/' + item.id"
+              class="text-decoration-none"
+            >
+              <span
+                :class="item.state ? 'text-red' : 'text-primary'"
+                :style="{
+                  'text-decoration': item.state ? 'line-through' : 'none',
+                }"
+                >{{ item.title }}</span
+              ></router-link
+            ></v-card-title
+          >
           <v-card-subtitle>
-          <span
-          :style="{
-            'text-decoration': item.state ? 'line-through' : 'none',
-          }"
-          >{{  item.endDate && formatDateTime(item.endDate) }}</span
-        ></v-card-subtitle>
+            <span
+              :style="{
+                'text-decoration': item.state ? 'line-through' : 'none',
+              }"
+              >{{ item.endDate && formatDateTime(item.endDate) }}</span
+            ></v-card-subtitle
+          >
         </v-card-item>
         <v-card-text>
           <v-row class="my-0 py-0">
             <v-col class="my-0 py-0"
               ><h3 class="mb-1">Description</h3>
               <div v-html="item.description"></div>
-
-              </v-col
-            >
+            </v-col>
           </v-row>
           <v-row class="my-0 py-0 align-center">
             <v-col class="my-0 py-1">
@@ -168,13 +174,18 @@
         ></v-checkbox>
       </template>
       <template v-slot:[`item.title`]="{ item }">
-      <router-link :to="'/task-edit/'+ item.columns.id" class="text-decoration-none text-primary">
-        <span class="font-weight-bold"
-          :style="{
-            'text-decoration': item.columns.state ? 'line-through' : 'none',
-          }"
-          >{{ item.columns.title }}</span
+        <router-link
+          :to="'/task-edit/' + item.columns.id"
+          class="text-decoration-none"
+          :class="item.columns.state ? 'text-red' : 'text-primary'"
         >
+          <span
+            class="font-weight-bold"
+            :style="{
+              'text-decoration': item.columns.state ? 'line-through' : 'none',
+            }"
+            >{{ item.columns.title }}</span
+          >
         </router-link>
       </template>
       <template v-slot:[`item.endDate`]="{ item }">
@@ -188,9 +199,21 @@
         >
       </template>
       <template v-slot:[`item.description`]="{ item }">
-        <div v-html="item.columns.description"
-          ></div
+        <div v-html="item.columns.description"></div>
+      </template>
+      <template v-slot:[`item.edit`]="{ item }">
+        <v-icon
+          size="small"
+          class="me-2"
+          @click="
+            (store.drawer = true),
+              (store.drawerType = 'edit'),
+              (store.drawerLocation = 'right'),
+              (store.editTaskId = item.columns.id)
+          "
         >
+          mdi-pencil
+        </v-icon>
       </template>
     </v-data-table>
   </div>
@@ -216,6 +239,7 @@ const headers = ref([
   { title: "Tags", key: "tags", sortable: false },
   { title: "End Date", key: "endDate", sortable: false },
   { title: "Description", key: "description", sortable: false },
+  { title: "Edit", key: "edit", sortable: false },
 ]);
 const sortingParams = ref([
   { title: "Sort by State ASC", value: "1" },

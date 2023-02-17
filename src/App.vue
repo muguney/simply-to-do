@@ -23,7 +23,11 @@
           Add New
         </v-btn>
       </v-btn-group>
-      <v-btn icon="mdi-menu" v-if="smAndDown" @click="menu = !menu"></v-btn>
+      <v-btn
+        icon="mdi-menu"
+        v-if="smAndDown"
+        @click="(store.drawer = !store.drawer), (store.drawerType = 'menu'),  (store.drawerLocation = 'left')"
+      ></v-btn>
     </v-app-bar>
     <v-main>
       <v-container fluid>
@@ -40,7 +44,7 @@
       ©Copyright {{ new Date().getFullYear() }} Simply To-Do List All Rights
       Reserved
     </v-footer>
-    <navigation v-model="menu" v-if="smAndDown" />
+    <drawer v-model="store.drawer" v-if="smAndDown && store.drawerType == 'menu' || store.drawerType == 'edit'" />
     <add-new-task></add-new-task>
   </v-app>
 </template>
@@ -49,10 +53,9 @@
 import { onMounted, ref, watch } from "vue";
 import { useDisplay } from "vuetify";
 import { useTodosStore } from "@/store/app";
-import Navigation from "@/layouts/Navigation";
+import drawer from "@/layouts/drawer";
 import addNewTask from "@/components/addNewTask";
 import alertSnack from "@/components/alertSnack";
 const store = useTodosStore();
-const menu = ref(false);
 const { smAndDown } = useDisplay();
 </script>

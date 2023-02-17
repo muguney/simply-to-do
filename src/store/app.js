@@ -5,6 +5,10 @@ export const useAppStore = defineStore("app", {
 });
 export const useTodosStore = defineStore("todos", {
   state: () => ({
+    drawer: false,
+    drawerType: "menu",
+    drawerLocation: "left",
+    editTaskId: "",
     lastId: 2,
     addDialog: false,
     alertState: false,
@@ -60,8 +64,17 @@ export const useTodosStore = defineStore("todos", {
       task.description = editTask.description
       task.state = editTask.state
     },
+    editTaskDrawer(id, editTask) {
+      const task = this.todoList.find((item) => item.id == id)
+      task.title = editTask.title
+      task.endDate = editTask.endDate
+      task.tags = editTask.tags
+    }
   },
   getters: {
+    getEditTaskId: (state) => {
+      return state.editTaskId
+    },
     getTaskById: (state) => {
       return (taskId) =>  state.todoList.find((item) => item.id == taskId)
     },
