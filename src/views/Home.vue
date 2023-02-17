@@ -3,16 +3,16 @@
     <v-toolbar class="elevation-1 mb-2">
       <v-toolbar-title>To-Do List</v-toolbar-title>
       <v-spacer></v-spacer>
-       <v-btn
-      color="primary"
-       variant="outlined"
-      prepend-icon="mdi-filter-outline"
-      @click="filterDialog = true"
-    >
-      Filters
-    </v-btn>
-
+      <v-btn
+        color="primary"
+        variant="outlined"
+        prepend-icon="mdi-filter-outline"
+        @click="filterDialog = true"
+      >
+        Filters
+      </v-btn>
     </v-toolbar>
+
 
     <v-dialog v-model="filterDialog" min-width="300" max-width="500">
       <v-card class="pa-3">
@@ -85,7 +85,7 @@
         class="mb-2 py-2"
         v-for="(item, i) in store.filterAll(
           tagsParam,
-          titleParam.toLowerCase(),
+          titleParam ? titleParam.toLowerCase() : '',
           sortingParam,
           taskStatus
         )"
@@ -114,7 +114,11 @@
           <v-row class="my-0 py-0 align-center">
             <v-col class="my-0 py-0"><h3 class="mb-1">Status</h3></v-col>
             <v-col class="my-0 py-0">
-              <v-checkbox v-model="item.state" @change="changeStatus(item.id,item.state)" hide-details="false"></v-checkbox>
+              <v-checkbox
+                v-model="item.state"
+                @change="changeStatus(item.id, item.state)"
+                hide-details="false"
+              ></v-checkbox>
             </v-col>
           </v-row>
         </v-card-text>
@@ -127,7 +131,7 @@
       :items="
         store.filterAll(
           tagsParam,
-          titleParam.toLowerCase(),
+          titleParam ? titleParam.toLowerCase() : '',
           sortingParam,
           taskStatus
         )
@@ -135,12 +139,11 @@
       items-per-page="-1"
       class="elevation-1 mt-4"
     >
-
       <template v-slot:[`item.state`]="{ item }">
         <v-checkbox
           v-model="item.columns.state"
           hide-details="false"
-            @change="changeStatus(item.columns.id,item.columns.state)"
+          @change="changeStatus(item.columns.id, item.columns.state)"
         ></v-checkbox>
       </template>
       <template v-slot:[`item.title`]="{ item }">
@@ -174,12 +177,12 @@ import { VDataTable } from "vuetify/labs/VDataTable";
 const store = useTodosStore();
 const { smAndDown } = useDisplay();
 const filterDialog = ref(false);
-const titleParam = ref("");
+const titleParam = ref();
 const sortingParam = ref();
 const tagsParam = ref();
 const taskStatus = ref();
 const headers = ref([
-  { title: "Id",  key: "id", sortable: false },
+  { title: "Id", key: "id", sortable: false, align: " d-none" },
   { title: "State", width: "90", key: "state", sortable: false },
   { title: "Title", key: "title", sortable: false },
   { title: "Tags", key: "tags", sortable: false },
@@ -200,8 +203,8 @@ const stateParams = ref([
 function formatDateTime(value) {
   return moment(new Date(value)).format("YYYY-MM-DD HH:mm");
 }
-function changeStatus(id,value){
- store.updateStatus(id,value,"teta")
+function changeStatus(id, value) {
+  store.updateStatus(id, value, "teta");
 }
 </script>
 <style>

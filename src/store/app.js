@@ -5,6 +5,12 @@ export const useAppStore = defineStore("app", {
 });
 export const useTodosStore = defineStore("todos", {
   state: () => ({
+    lastId: 2,
+    addDialog: false,
+    alertState: false,
+    alertType: "success",
+    alertTitle: "",
+    alertDescription: "",
     todoList: [
       {
         id: 0,
@@ -34,9 +40,20 @@ export const useTodosStore = defineStore("todos", {
   }),
   actions: {
     updateStatus(id, value) {
-      console.log("action",id,value)
-      this.todoList.find((item) => item.id==id).state = value
-    }
+      this.todoList.find((item) => item.id == id).state = value;
+    },
+    addTask(newTask) {
+      this.lastId++;
+      const newItem = {
+        id: this.lastId,
+        title: newTask.title,
+        tags: newTask.tags,
+        endDate: newTask.endDate,
+        state: newTask.state,
+        description: newTask.description,
+      };
+      this.todoList.push(newItem);
+    },
   },
   getters: {
     getTags: (state) => {
