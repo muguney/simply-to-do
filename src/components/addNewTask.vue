@@ -13,10 +13,12 @@
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-toolbar>
+
         <v-text-field
           v-model="title"
           outlined
           clearable
+          @input="titleCheck()"
           variant="solo"
           class="font-weight-bold mb-2"
           label="Title"
@@ -32,18 +34,13 @@
           variant="solo"
           class="font-weight-bold mb-2"
           label="Task Tags"
+          v-on:keypress="isLetter($event)"
           multiple
           hide-details
           chips
         ></v-combobox>
 
-        <v-textarea
-          v-model="description"
-          variant="solo"
-          label="Description"
-          hide-details
-          class="font-weight-bold mb-2"
-        ></v-textarea>
+
         <v-text-field
           v-model="endDate"
           solo
@@ -54,9 +51,10 @@
           readonly
           @click="datepicker = !datepicker"
         >
-         <template #label>
+          <template #label>
             <span class="text-red"><strong>* </strong></span>Task End Date
-          </template></v-text-field>
+          </template></v-text-field
+        >
         <div class="d-flex justify-center align-center flex-column">
           <VueDatePicker
             v-model="endDate"
@@ -101,36 +99,52 @@ const store = useTodosStore();
 const tags = ref([]);
 const title = ref();
 const endDate = ref();
-const description = ref();
 const state = ref(false);
 const datepicker = ref(false);
-const newTask = ref()
+const newTask = ref();
 
-function save() {
-  //  if (title == "") {
-  //     store.alertState = true
-  //  } else
-  //  {
-this.newTask = {
-    title : title,
-    tags : tags,
-    endDate : endDate,
-    state : state,
-    description : description
+// Set max length for title field
+function titleCheck() {
+  if (title.value.length == 30) {
+    title.value = title.value.substring(0, title.value.length - 1);
   }
-  store.addTask(this.newTask);
-  store.addDialog = false
-
-  // clear form data
-  this.title = null
-  this.tags = null
-  this.endDate = null
-  this.description = null
-  this.state = false
-   }
-
+}
+// Check tags field for numeric
+function isLetter(e) {
+  let char = String.fromCharCode(e.keyCode);
+  if (/^[A-Za-z]+$/.test(char)) return true;
+  else e.preventDefault();
 }
 
+
+function save() {
+  if (
+    title.value == undefined ||
+    title.value == null ||
+    endDate.value == undefined ||
+    endDate.value == null
+  ) {
+    store.alertType = "error";
+    store.alertText = "Please fill title field and select task end date !";
+    store.alertState = true;
+  } else {
+    this.newTask = {
+      title: title,
+      tags: tags,
+      endDate: endDate,
+      state: state,
+      description: null,
+    };
+    store.addTask(this.newTask);
+    store.addDialog = false;
+    // clear form data
+    this.title = null;
+    this.tags = null;
+    this.endDate = null;
+    this.description = null;
+    this.state = false;
+  }
+}
 </script>
 
 <style lang="scss" scoped>

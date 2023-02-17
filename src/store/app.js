@@ -9,8 +9,7 @@ export const useTodosStore = defineStore("todos", {
     addDialog: false,
     alertState: false,
     alertType: "success",
-    alertTitle: "",
-    alertDescription: "",
+    alertText: "",
     todoList: [
       {
         id: 0,

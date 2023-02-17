@@ -2,15 +2,34 @@
   <div>
     <v-toolbar class="elevation-1 mb-2">
       <v-toolbar-title>To-Do List</v-toolbar-title>
-      <v-spacer></v-spacer>
-      <v-btn
+      <v-spacer v-if="!smAndDown"></v-spacer>
+        <v-spacer v-if="!smAndDown"></v-spacer>
+        <v-spacer v-if="!smAndDown"></v-spacer>
+       <v-text-field
+          v-model="titleParam"
+          outlined
+          density="compact"
+          clearable
+          class="font-weight-bold mr-1"
+          prepend-inner-icon="mdi-magnify"
+          :label="!smAndDown ? 'Search by title' : 'Search'"
+          max-width="200"
+          hide-details
+        ></v-text-field>
+
+      <v-btn v-if="!smAndDown"
         color="primary"
         variant="outlined"
         prepend-icon="mdi-filter-outline"
         @click="filterDialog = true"
       >
-        Filters
+       Filters
       </v-btn>
+
+        <v-btn v-else   color="primary" icon  @click="filterDialog = true">
+            <v-icon>mdi-filter-outline</v-icon>
+          </v-btn>
+
     </v-toolbar>
 
 
@@ -22,16 +41,7 @@
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-toolbar>
-        <v-text-field
-          v-model="titleParam"
-          outlined
-          clearable
-          variant="solo"
-          class="font-weight-bold mb-2"
-          prepend-inner-icon="mdi-magnify"
-          label="Search by title"
-          hide-details
-        ></v-text-field>
+
         <v-select
           outlined
           clearable
@@ -92,10 +102,19 @@
         :key="i"
       >
         <v-card-item>
-          <v-card-title>{{ item.title }}</v-card-title>
-          <v-card-subtitle>{{
-            item.endDate && formatDateTime(item.endDate)
-          }}</v-card-subtitle>
+          <v-card-title><span
+          :style="{
+            'text-decoration': item.state ? 'line-through' : 'none',
+          }"
+          >{{ item.title }}</span
+        ></v-card-title>
+          <v-card-subtitle>
+          <span
+          :style="{
+            'text-decoration': item.state ? 'line-through' : 'none',
+          }"
+          >{{  item.endDate && formatDateTime(item.endDate) }}</span
+        ></v-card-subtitle>
         </v-card-item>
         <v-card-text>
           <v-row class="my-0 py-0">
@@ -147,12 +166,14 @@
         ></v-checkbox>
       </template>
       <template v-slot:[`item.title`]="{ item }">
-        <span
+      <router-link :to="'/task-edit/'+ item.columns.id" class="text-decoration-none text-primary">
+        <span class="font-weight-bold"
           :style="{
             'text-decoration': item.columns.state ? 'line-through' : 'none',
           }"
           >{{ item.columns.title }}</span
         >
+        </router-link>
       </template>
       <template v-slot:[`item.endDate`]="{ item }">
         <span
