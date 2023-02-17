@@ -53,8 +53,18 @@ export const useTodosStore = defineStore("todos", {
       };
       this.todoList.push(newItem);
     },
+    editTask(id, editTask) {
+      const task = this.todoList.find((item) => item.id == id)
+      task.title = editTask.title
+      task.endDate = editTask.endDate
+      task.description = editTask.description
+      task.state = editTask.state
+    },
   },
   getters: {
+    getTaskById: (state) => {
+      return (taskId) =>  state.todoList.find((item) => item.id == taskId)
+    },
     getTags: (state) => {
       let tags = [];
       for (let i = 0; i < state.todoList.length; i++) {

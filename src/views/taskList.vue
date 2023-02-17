@@ -120,7 +120,9 @@
           <v-row class="my-0 py-0">
             <v-col class="my-0 py-0"
               ><h3 class="mb-1">Description</h3>
-              {{ item.description }}</v-col
+              <div v-html="item.description"></div>
+
+              </v-col
             >
           </v-row>
           <v-row class="my-0 py-0 align-center">
@@ -183,6 +185,11 @@
           >{{
             item.columns.endDate && formatDateTime(item.columns.endDate)
           }}</span
+        >
+      </template>
+      <template v-slot:[`item.description`]="{ item }">
+        <div v-html="item.columns.description"
+          ></div
         >
       </template>
     </v-data-table>
