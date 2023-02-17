@@ -198,6 +198,12 @@
           }}</span
         >
       </template>
+        <template v-slot:[`item.tags`]="{ item }">
+
+           <v-chip v-for="(tag, x) in item.columns.tags" :key="x" class="mb-1 mr-1">
+                {{ tag }}
+              </v-chip>
+      </template>
       <template v-slot:[`item.description`]="{ item }">
         <div v-html="item.columns.description"></div>
       </template>

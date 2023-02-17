@@ -9,6 +9,7 @@
         outlined
         clearable
         @input="titleCheck()"
+        v-on:keypress="isLetter($event)"
         variant="solo"
         class="font-weight-bold mb-2"
         label="Title"
@@ -57,12 +58,8 @@
           class="font-weight-bold ml-1"
           hide-details
         ></v-switch>
-        <v-btn color="red" variant="flat" to="/">
-          Back to List
-        </v-btn>
-        <v-btn color="green" variant="flat" @click="save()">
-          Save Task
-        </v-btn>
+        <v-btn color="red" variant="flat" to="/"> Back to List </v-btn>
+        <v-btn color="green" variant="flat" @click="save()"> Save Task </v-btn>
       </v-card-actions>
     </v-card>
   </div>
@@ -91,7 +88,12 @@ function titleCheck() {
     title.value = title.value.substring(0, title.value.length - 1);
   }
 }
-
+// Check field for numeric
+function isLetter(e) {
+  let char = String.fromCharCode(e.keyCode);
+  if (/^[A-Za-z]+$/.test(char)) return true;
+  else e.preventDefault();
+}
 onMounted(() => {
   const currentTask = store.getTaskById(route.params.taskId);
   title.value = currentTask.title;

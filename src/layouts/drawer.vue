@@ -26,6 +26,7 @@
         outlined
         clearable
         @input="titleCheck()"
+        v-on:keypress="isLetter($event)"
         variant="solo"
         class="font-weight-bold mb-2"
         label="Title"
@@ -107,7 +108,12 @@ function titleCheck() {
     title.value = title.value.substring(0, title.value.length - 1);
   }
 }
-
+// Check field for numeric
+function isLetter(e) {
+  let char = String.fromCharCode(e.keyCode);
+  if (/^[A-Za-z]+$/.test(char)) return true;
+  else e.preventDefault();
+}
 watch(getEditTaskId, (newId, oldId) => {
   console.log(newId, oldId);
   const currentTask = store.getTaskById(newId);
@@ -123,10 +129,7 @@ onMounted(() => {
 });
 
 function save() {
-  if (
-    title.value == undefined ||
-    title.value == null
-  ) {
+  if (title.value == undefined || title.value == null) {
     store.alertType = "error";
     store.alertText = "Please fill the title field!";
     store.alertState = true;

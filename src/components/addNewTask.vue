@@ -18,6 +18,7 @@
           v-model="title"
           outlined
           clearable
+          v-on:keypress="isLetter($event)"
           @input="titleCheck()"
           variant="solo"
           class="font-weight-bold mb-2"
@@ -109,7 +110,7 @@ function titleCheck() {
     title.value = title.value.substring(0, title.value.length - 1);
   }
 }
-// Check tags field for numeric
+// Check field for numeric
 function isLetter(e) {
   let char = String.fromCharCode(e.keyCode);
   if (/^[A-Za-z]+$/.test(char)) return true;
